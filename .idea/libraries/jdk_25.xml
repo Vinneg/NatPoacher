@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="jdk-25">
+    <ANNOTATIONS>
+      <root url="file://C:/Program Files/Java/jdk-25" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="file://C:/Program Files/Java/jdk-25" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://C:/Program Files/Java/jdk-25" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="file://C:/Program Files/Java/jdk-25" />
+    </NATIVE>
+    <SOURCES>
+      <root url="file://C:/Program Files/Java/jdk-25" />
+    </SOURCES>
+    <jarDirectory url="file://C:/Program Files/Java/jdk-25" recursive="false" />
+    <jarDirectory url="file://C:/Program Files/Java/jdk-25" recursive="false" type="SOURCES" />
+  </library>
+</component>
