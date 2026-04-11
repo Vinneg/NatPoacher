@@ -7,11 +7,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.awt.*;
+
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws AWTException {
+        Worker worker = new Worker();
+        Thread workerThread = new Thread(worker, "WorkerThread");
+
         // Заголовок окна
+        primaryStage.setX(890);
+        primaryStage.setY(240);
         primaryStage.setTitle("Nat Poacher");
         primaryStage.setOpacity(0.3); // непрозрачность
         primaryStage.initStyle(StageStyle.UTILITY);
@@ -21,24 +28,41 @@ public class Main extends Application {
         root.setStyle("-fx-padding: 20; -fx-background-color: #f0f0f0;");
 
         // Создаём первую кнопку
-        Button button1 = new Button("Кнопка 1");
+        Button button1 = new Button("FISH");
         button1.setPrefSize(120, 40);
         button1.setOnAction(e -> {
-            primaryStage.close(); // Закрывает текущее окно
+            int x = (int) primaryStage.getX();
+            int y = (int) primaryStage.getY();
+            int width = (int) primaryStage.getWidth();
+            int height = (int) primaryStage.getHeight();
+
+            System.out.println("win " + x + "-" + y + " " + width + "-" + height);
+
+            try {
+                worker.clicker = new Clicker(x, y, width, height);
+//                workerThread.start();
+                worker.run();
+            } catch (AWTException ex) {
+            }
         });
 
         // Создаём вторую кнопку
-        Button button2 = new Button("Кнопка 2");
+        Button button2 = new Button("STOP");
         button2.setPrefSize(120, 40);
         button2.setOnAction(e -> {
-            System.out.println("Нажата Кнопка 2!");
+            try {
+                workerThread.interrupt();
+                workerThread.join(3 * 60 * 1_000);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         // Добавляем кнопки в контейнер
         root.getChildren().addAll(button1, button2);
 
         // Создаём сцену с контейнером
-        Scene scene = new Scene(root, 300, 200);
+        Scene scene = new Scene(root, 780, 240);
 
         // Устанавливаем сцену в окно
         primaryStage.setScene(scene);
@@ -50,4 +74,5 @@ public class Main extends Application {
     static void main(String[] args) {
         launch(args);
     }
+
 }
