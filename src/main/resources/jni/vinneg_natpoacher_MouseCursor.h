@@ -9,10 +9,10 @@ extern "C" {
 #endif
 /*
  * Class:     vinneg_natpoacher_MouseCursor
- * Method:    getCursorHash
- * Signature: ()Ljava/lang/String;
+ * Method:    getCursor
+ * Signature: ()[B
  */
-JNIEXPORT jstring JNICALL Java_vinneg_natpoacher_MouseCursor_getCursorHash
+JNIEXPORT jbyteArray JNICALL Java_vinneg_natpoacher_MouseCursor_getCursor
   (JNIEnv *, jobject);
 
 #ifdef __cplusplus

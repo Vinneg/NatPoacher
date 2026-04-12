@@ -1,10 +1,6 @@
 package vinneg.natpoacher;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,10 +14,6 @@ public class Seeker {
     private final BufferedImage image;
     private int cx;
     private int cy;
-
-    public Seeker(String image) throws IOException {
-        this(ImageIO.read(new File("C:\\Users\\vinogradovav\\downloads\\test.jpg")));
-    }
 
     public Seeker(BufferedImage image) {
         this.image = image;
@@ -54,15 +46,10 @@ public class Seeker {
                 int blue = rgb & 0xFF;
 
                 if (red > THRESHOLD && red > green * RATIO && red > blue * RATIO) {
-//                    image.setRGB(x,y, Color.RED.getRGB());
                     candidates.add(new Pixel(x, y));
-                } else {
-//                    image.setRGB(x,y, Color.LIGHT_GRAY.getRGB());
                 }
             }
         }
-
-//        ImageIO.write(image, "jpg", new File("C:\\Users\\vinogradovav\\Downloads\\test+.jpg"));
     }
 
     public Pixel central() {

@@ -4,93 +4,66 @@
 #include <wincrypt.h>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 #include "vinneg_natpoacher_MouseCursor.h"
 
-// Простейшая реализация MD5 (упрощённая для примера)
-// В реальном проекте лучше использовать готовую библиотеку
-
-// MD5 хэширование через CryptAPI (Windows)
-std::string MD5Hash(BYTE* data, size_t len) {
-    HCRYPTPROV hProv;
-    HCRYPTHASH hHash;
-    DWORD dwHashLen = 16;
-    BYTE hash[16];
-    std::stringstream ss;
-
-    if (!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) return "";
-    if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash)) {
-        CryptReleaseContext(hProv, 0);
-        return "";
-    }
-    if (!CryptHashData(hHash, data, len, 0)) {
-        CryptDestroyHash(hHash);
-        CryptReleaseContext(hProv, 0);
-        return "";
-    }
-    if (!CryptGetHashParam(hHash, HP_ALGID, (BYTE*)&dwHashLen, &dwHashLen, 0)) {
-        CryptDestroyHash(hHash);
-        CryptReleaseContext(hProv, 0);
-        return "";
-    }
-
-    CryptGetHashParam(hHash, HP_HASHVAL, hash, &dwHashLen, 0);
-
-    CryptDestroyHash(hHash);
-    CryptReleaseContext(hProv, 0);
-
-    for (int i = 0; i < 16; i++) {
-        ss << std::setfill('0') << std::setw(2) << std::hex << (int)hash[i];
-    }
-    return ss.str();
-}
-
-JNIEXPORT jstring JNICALL Java_vinneg_natpoacher_MouseCursor_getCursorHash(JNIEnv* env, jobject) {
-    CURSORINFO ci = {0};
-    ci.cbSize = sizeof(CURSORINFO);
-
+JNIEXPORT jbyteArray JNICALL Java_vinneg_natpoacher_MouseCursor_getCursor(JNIEnv* env, jobject) {
+    CURSORINFO ci = {sizeof(CURSORINFO)};
     if (!GetCursorInfo(&ci)) {
-        return env->NewStringUTF("error: GetCursorInfo failed");
+        return nullptr;
     }
 
     ICONINFO ii = {0};
     if (!GetIconInfo(ci.hCursor, &ii)) {
-        return env->NewStringUTF("error: GetIconInfo failed");
+        return nullptr;
     }
 
-    // Работаем только с изображением (без маски)
-    // Получаем DIB биты
+    // Проверяем, есть ли цветное изображение
+    if (ii.hbmColor == NULL) {
+        DeleteObject(ii.hbmMask);
+        return nullptr; // Монохромный курсор
+    }
+
+    // Создаём совместимый контекст устройства
     HDC hdcScreen = GetDC(NULL);
-    HDC hdc = CreateCompatibleDC(hdcScreen);
+    HDC hdcMem = CreateCompatibleDC(hdcScreen);
 
-    // Получаем размеры
-    BITMAP bmp;
-    GetObject(ii.hbmColor, sizeof(BITMAP), &bmp);
+    // Выбираем битовое изображение в контекст
+    HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, ii.hbmColor);
 
-    // Создаём DIB
-    BITMAPINFOHEADER bi = {0};
-    bi.biSize = sizeof(BITMAPINFOHEADER);
-    bi.biWidth = bmp.bmWidth;
-    bi.biHeight = -bmp.bmHeight;  // Вертикальное отражение
-    bi.biPlanes = 1;
-    bi.biBitCount = 32;
-    bi.biCompression = BI_RGB;
+    // Получаем информацию о битовом образе
+    BITMAP bm;
+    GetObject(ii.hbmColor, sizeof(BITMAP), &bm);
 
-    BYTE* pixels = nullptr;
-    HBITMAP hbmp = CreateDIBSection(hdc, (BITMAPINFO*)&bi, DIB_RGB_COLORS, (void**)&pixels, NULL, 0);
+    // Заполняем структуру BITMAPINFO
+    BITMAPINFO bmi = {};
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = bm.bmWidth;
+    bmi.bmiHeader.biHeight = -bm.bmHeight; // Отрицательная высота для прямого порядка строк
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32; // 32 бита на пиксель (RGBA)
+    bmi.bmiHeader.biCompression = BI_RGB;
 
-    HGDIOBJ old = SelectObject(hdc, hbmp);
-    DrawIconEx(hdc, 0, 0, ci.hCursor, 0, 0, 0, NULL, DI_NORMAL | DI_IMAGE);
-    SelectObject(hdc, old);
+    // Рассчитываем размер буфера
+    int rowSize = ((bm.bmWidth * 32 + 31) / 32) * 4; // Выравнивание по 4 байтам
+    int bufferSize = rowSize * bm.bmHeight;
 
-    // Хэшируем только цветные пиксели (игнорируя альфа-канал, если нужно)
-    std::string hash = MD5Hash(pixels, bmp.bmWidth * bmp.bmHeight * 4);
+    std::vector<BYTE> pixelData(bufferSize);
 
-    // Очистка
-    DeleteObject(hbmp);
-    DeleteDC(hdc);
+    // Извлекаем пиксельные данные
+    if (!GetDIBits(hdcMem, ii.hbmColor, 0, bm.bmHeight, pixelData.data(), &bmi, DIB_RGB_COLORS)) {
+        pixelData.clear();
+    }
+
+    // Очищаем ресурсы
+    SelectObject(hdcMem, hbmOld);
+    DeleteDC(hdcMem);
     ReleaseDC(NULL, hdcScreen);
     if (ii.hbmColor) DeleteObject(ii.hbmColor);
     if (ii.hbmMask) DeleteObject(ii.hbmMask);
 
-    return env->NewStringUTF(hash.c_str());
+    jbyteArray result = env->NewByteArray(pixelData.size());
+    env->SetByteArrayRegion(result, 0, pixelData.size(), reinterpret_cast<jbyte*>(pixelData.data()));
+
+    return result;
 }

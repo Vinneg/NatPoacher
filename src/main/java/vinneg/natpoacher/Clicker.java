@@ -11,7 +11,7 @@ import static java.lang.System.currentTimeMillis;
 
 public class Clicker {
 
-    private static final double speed = 1080D / 1000;
+    private static final double speed = 1_080D / 3_000;
 
     private final Robot robot;
     private final Rectangle area;

@@ -7,7 +7,7 @@ public class Bobber {
 
     public static final int SIDE = 2 * Seeker.R + 1;
     public static final int SQUARE = Seeker.square(SIDE);
-    private static final double RATIO = 1.3;
+    private static final int DIFF = 4;
 
     public final Clicker clicker;
 
@@ -46,9 +46,15 @@ public class Bobber {
     }
 
     public boolean still() {
-        int diff = getRedness() - redness;
+        int cur = getRedness();
+        int diff = cur - redness;
+        boolean res = -DIFF <= diff && diff <= DIFF;
 
-        return -RATIO <= diff && diff <= RATIO;
+        if (!res) {
+            System.out.println("Bobber triggered with redness " + cur);
+        }
+
+        return res;
     }
 
 }

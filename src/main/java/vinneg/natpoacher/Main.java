@@ -8,11 +8,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.awt.*;
+import java.security.NoSuchAlgorithmException;
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws AWTException {
+    public void start(Stage primaryStage) throws NoSuchAlgorithmException {
         Worker worker = new Worker();
         Thread workerThread = new Thread(worker, "WorkerThread");
 
@@ -20,7 +21,7 @@ public class Main extends Application {
         primaryStage.setX(890);
         primaryStage.setY(240);
         primaryStage.setTitle("Nat Poacher");
-        primaryStage.setOpacity(0.3); // непрозрачность
+        primaryStage.setOpacity(0.4); // непрозрачность
         primaryStage.initStyle(StageStyle.UTILITY);
 
         // Создаём контейнер для элементов (вертикальная компоновка)
@@ -40,8 +41,7 @@ public class Main extends Application {
 
             try {
                 worker.clicker = new Clicker(x, y, width, height);
-//                workerThread.start();
-                worker.run();
+                workerThread.start();
             } catch (AWTException ex) {
             }
         });
