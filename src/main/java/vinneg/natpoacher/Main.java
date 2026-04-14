@@ -19,7 +19,7 @@ public class Main extends Application {
 
         // Заголовок окна
         primaryStage.setX(890);
-        primaryStage.setY(240);
+        primaryStage.setY(120);
         primaryStage.setTitle("Nat Poacher");
         primaryStage.setOpacity(0.4); // непрозрачность
         primaryStage.initStyle(StageStyle.UTILITY);
@@ -41,7 +41,8 @@ public class Main extends Application {
 
             try {
                 worker.clicker = new Clicker(x, y, width, height);
-                workerThread.start();
+//                workerThread.start();
+                worker.run();
             } catch (AWTException ex) {
             }
         });
@@ -62,7 +63,7 @@ public class Main extends Application {
         root.getChildren().addAll(button1, button2);
 
         // Создаём сцену с контейнером
-        Scene scene = new Scene(root, 780, 240);
+        Scene scene = new Scene(root, 780, 350);
 
         // Устанавливаем сцену в окно
         primaryStage.setScene(scene);

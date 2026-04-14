@@ -3,11 +3,14 @@ package vinneg.natpoacher;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static vinneg.natpoacher.Seeker.RATIO;
+import static vinneg.natpoacher.Seeker.THRESHOLD;
+
 public class Bobber {
 
     public static final int SIDE = 2 * Seeker.R + 1;
     public static final int SQUARE = Seeker.square(SIDE);
-    private static final int DIFF = 4;
+    private static final int DIFF = 10;
 
     public final Clicker clicker;
 
@@ -34,15 +37,23 @@ public class Bobber {
         BufferedImage image = clicker.bobber(this);
 
         long ttl = 0;
+        long c = 0;
 
         for (int y = 0; y < SIDE; y++) {
             for (int x = 0; x < SIDE; x++) {
                 int rgb = image.getRGB(x, y);
-                ttl += (rgb >> 16) & 0xFF;
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                if (red > THRESHOLD && red > green * RATIO && red > blue * RATIO) {
+                    ttl += red;
+                    c++;
+                }
             }
         }
 
-        return (int) (ttl / SQUARE);
+        return (int) (ttl / c);
     }
 
     public boolean still() {
