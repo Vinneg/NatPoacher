@@ -25,11 +25,11 @@ public class Worker implements Runnable {
         clicker.delay(2000);
 
         long nextLure = 0;
-        long endAt = currentTimeMillis() + 2 * BUFF_DURATION;
+        long endAt = currentTimeMillis() + 6 * BUFF_DURATION;
         AtomicInteger noBobber = new AtomicInteger();
 
         while (!Thread.currentThread().isInterrupted() && endAt > currentTimeMillis()) {
-            long seconds = (endAt - currentTimeMillis()) / 1000;
+            long seconds = (endAt - currentTimeMillis()) / 1_000;
             System.out.println("Time left: " + String.format("%d:%02d", seconds / 60, seconds % 60));
 
             if (nextLure < currentTimeMillis()) {
@@ -37,16 +37,19 @@ public class Worker implements Runnable {
                 clicker.key(KeyEvent.VK_SEMICOLON);
                 clicker.delay(BUFF_CAST);
 
-                nextLure = currentTimeMillis() + BUFF_DURATION + 1_000;
+                nextLure = currentTimeMillis() + BUFF_DURATION + 2_000;
+
+                clicker.delay(1_000);
             }
 
             // fishing
             clicker.key(KeyEvent.VK_QUOTE);
-            clicker.delay(2_000);
+            clicker.delay(1_000);
 
             // seek for bobber
             Seeker seeker = new Seeker(clicker.screen());
             seeker.fill();
+            int attempt = 0;
 
             Seeker.Mass m;
             do {
@@ -56,13 +59,13 @@ public class Worker implements Runnable {
                         .map(clicker::move)
                         .orElse(null);
 
+                attempt++;
                 clicker.delay(50);
-            } while (m != null && !mouseCursor.isGear());
+            } while (m != null && !mouseCursor.isGear() && attempt < 5);
 
-            if (m == null) {
-                System.out.println("Bobber not found");
+            if (m == null || attempt >= 5) {
+                System.out.println("Bobber not found " + noBobber.incrementAndGet() + " times");
 
-                noBobber.incrementAndGet();
                 clicker.delay(1_000);
 
                 continue;
@@ -70,8 +73,8 @@ public class Worker implements Runnable {
                 noBobber.set(0);
             }
 
-            if (noBobber.get() > 10) {
-                System.out.println("Bobber not found 10 times in a row. Exit");
+            if (noBobber.get() > 25) {
+                System.out.println("Bobber not found 25 times in a row. Exit");
                 return;
             }
 
