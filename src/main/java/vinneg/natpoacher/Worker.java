@@ -9,6 +9,8 @@ import static java.lang.System.currentTimeMillis;
 
 public class Worker implements Runnable {
 
+    private static Thread main;
+
     private static final int BUFF_DURATION = 600_000;
     private static final int LURE_DURATION = 22_000;
     private static final int BUFF_CAST = 6_000 + 100;
@@ -25,7 +27,8 @@ public class Worker implements Runnable {
         clicker.delay(2000);
 
         long nextLure = 0;
-        long endAt = currentTimeMillis() + 6 * BUFF_DURATION;
+//        long nextLure = currentTimeMillis() + BUFF_DURATION + BUFF_CAST + 1_000;
+        long endAt = currentTimeMillis() + 1 * BUFF_DURATION;
         AtomicInteger noBobber = new AtomicInteger();
 
         while (!Thread.currentThread().isInterrupted() && endAt > currentTimeMillis()) {
@@ -44,7 +47,7 @@ public class Worker implements Runnable {
 
             // fishing
             clicker.key(KeyEvent.VK_QUOTE);
-            clicker.delay(1_000);
+            clicker.delay(1_500);
 
             // seek for bobber
             Seeker seeker = new Seeker(clicker.screen());
@@ -66,7 +69,7 @@ public class Worker implements Runnable {
             if (m == null || attempt >= 5) {
                 System.out.println("Bobber not found " + noBobber.incrementAndGet() + " times");
 
-                clicker.delay(1_000);
+                clicker.delay(500);
 
                 continue;
             } else {
@@ -103,7 +106,36 @@ public class Worker implements Runnable {
             clicker.delay(1_000);
         }
 
+        clicker.delay(2_000);
+        clicker.key(KeyEvent.VK_SLASH);
+
         System.out.println("Fishing finished");
+    }
+
+    public static void start(Clicker clicker) throws NoSuchAlgorithmException {
+        if (main == null) {
+            Worker worker = new Worker();
+            worker.clicker = clicker;
+
+            main = new Thread(worker, "WorkerThread");;
+        }
+
+        main.start();
+    }
+
+    public static void stop() {
+        if (main == null) {
+            return;
+        }
+
+        try {
+            main.interrupt();
+            main.join(3 * 60 * 1_000); // ждём до 3 минут
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            main = null;
+        }
     }
 
 }

@@ -9,7 +9,7 @@ import static vinneg.natpoacher.Seeker.THRESHOLD;
 public class Bobber {
 
     public static final int SIDE = 2 * Seeker.R + 1;
-    private static final int DIFF = 10;
+    private static final int DIFF = 20;
 
     public final Clicker clicker;
 
