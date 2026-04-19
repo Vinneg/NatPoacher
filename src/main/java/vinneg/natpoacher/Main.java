@@ -22,20 +22,20 @@ public class Main extends Application {
         primaryStage.setX(1800);
         primaryStage.setY(220);
 
+        // Создаём контейнер для элементов (вертикальная компоновка)
+        VBox root = new VBox(10); // 10 — отступ между элементами
+        root.setStyle("-fx-padding: 20; -fx-background-color: #f0f0f0;");
+
         // Дополнительное окно (создаём заранее, но не показываем)
         Stage secondaryStage = new Stage();
         secondaryStage.setTitle("Secondary Window");
         secondaryStage.initStyle(StageStyle.UTILITY);
         secondaryStage.initOwner(primaryStage);
         secondaryStage.setX(870);
-        secondaryStage.setY(120);
+        secondaryStage.setY(80);
         secondaryStage.setOpacity(0.4); // непрозрачность
         secondaryStage.setWidth(800);
-        secondaryStage.setHeight(350);
-
-        // Создаём контейнер для элементов (вертикальная компоновка)
-        VBox root = new VBox(10); // 10 — отступ между элементами
-        root.setStyle("-fx-padding: 20; -fx-background-color: #f0f0f0;");
+        secondaryStage.setHeight(400);
 
         // Создаём первую кнопку
         Button button1 = new Button("FISH");
@@ -50,7 +50,7 @@ public class Main extends Application {
 
             try {
                 Worker.start(new Clicker(x, y, width, height));
-            } catch (AWTException | NoSuchAlgorithmException ex) {
+            } catch (AWTException | NoSuchAlgorithmException ignore) {
             }
         });
 

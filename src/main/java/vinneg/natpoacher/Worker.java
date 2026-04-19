@@ -3,6 +3,7 @@ package vinneg.natpoacher;
 import java.awt.event.KeyEvent;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.System.currentTimeMillis;
@@ -10,6 +11,7 @@ import static java.lang.System.currentTimeMillis;
 public class Worker implements Runnable {
 
     private static Thread main;
+    private static long nextLure = 0;
 
     private static final int BUFF_DURATION = 600_000;
     private static final int LURE_DURATION = 22_000;
@@ -24,23 +26,17 @@ public class Worker implements Runnable {
 
     @Override
     public void run() {
-        clicker.delay(2000);
+        clicker.delay(2_000);
 
-        long nextLure = 0;
-//        long nextLure = currentTimeMillis() + BUFF_DURATION + BUFF_CAST + 1_000;
-        long endAt = currentTimeMillis() + 1 * BUFF_DURATION;
         AtomicInteger noBobber = new AtomicInteger();
 
-        while (!Thread.currentThread().isInterrupted() && endAt > currentTimeMillis()) {
-            long seconds = (endAt - currentTimeMillis()) / 1_000;
-            System.out.println("Time left: " + String.format("%d:%02d", seconds / 60, seconds % 60));
-
+        while (!Thread.currentThread().isInterrupted()) {
             if (nextLure < currentTimeMillis()) {
                 // lure
                 clicker.key(KeyEvent.VK_SEMICOLON);
                 clicker.delay(BUFF_CAST);
 
-                nextLure = currentTimeMillis() + BUFF_DURATION + 2_000;
+                nextLure = currentTimeMillis() + BUFF_DURATION + 3_000;
 
                 clicker.delay(1_000);
             }
@@ -63,10 +59,10 @@ public class Worker implements Runnable {
                         .orElse(null);
 
                 attempt++;
-                clicker.delay(50);
-            } while (m != null && !mouseCursor.isGear() && attempt < 5);
+                clicker.delay(25);
+            } while (m != null && !mouseCursor.isGear() && attempt < 15);
 
-            if (m == null || attempt >= 5) {
+            if (m == null || attempt >= 15) {
                 System.out.println("Bobber not found " + noBobber.incrementAndGet() + " times");
 
                 clicker.delay(500);
@@ -76,7 +72,7 @@ public class Worker implements Runnable {
                 noBobber.set(0);
             }
 
-            if (noBobber.get() > 25) {
+            if (noBobber.getPlain() > 25) {
                 System.out.println("Bobber not found 25 times in a row. Exit");
                 return;
             }
@@ -117,7 +113,7 @@ public class Worker implements Runnable {
             Worker worker = new Worker();
             worker.clicker = clicker;
 
-            main = new Thread(worker, "WorkerThread");;
+            main = new Thread(worker, UUID.randomUUID().toString());
         }
 
         main.start();
