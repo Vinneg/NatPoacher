@@ -42,6 +42,9 @@ public class Worker implements Runnable {
             }
 
             // fishing
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
             clicker.key(KeyEvent.VK_QUOTE);
             clicker.delay(1_500);
 
@@ -50,8 +53,11 @@ public class Worker implements Runnable {
             seeker.fill();
             int attempt = 0;
 
-            Seeker.Mass m;
+            Seeker.Mass m = null;
             do {
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 m = Optional.of(seeker)
                         .map(Seeker::central)
                         .map(seeker::pull)
@@ -61,6 +67,10 @@ public class Worker implements Runnable {
                 attempt++;
                 clicker.delay(25);
             } while (m != null && !mouseCursor.isGear() && attempt < 15);
+
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
 
             if (m == null || attempt >= 15) {
                 System.out.println("Bobber not found " + noBobber.incrementAndGet() + " times");
@@ -85,9 +95,13 @@ public class Worker implements Runnable {
             long et = currentTimeMillis() + LURE_DURATION;
             boolean bite = false;
 
-            for (long t = 0; t < et && !bite; t = currentTimeMillis()) {
+            for (long t = 0; t < et && !bite && !Thread.currentThread().isInterrupted(); t = currentTimeMillis()) {
                 clicker.delay(25);
                 bite = !bobber.still();
+            }
+
+            if (Thread.currentThread().isInterrupted()) {
+                break;
             }
 
             if (bite) {
@@ -96,14 +110,20 @@ public class Worker implements Runnable {
                 System.out.println("Bobber not triggered");
             }
 
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
+
             // clear bags
             clicker.delay(1_000);
             clicker.key(KeyEvent.VK_SLASH);
             clicker.delay(1_000);
         }
 
-        clicker.delay(2_000);
-        clicker.key(KeyEvent.VK_SLASH);
+        if (!Thread.currentThread().isInterrupted()) {
+            clicker.delay(2_000);
+            clicker.key(KeyEvent.VK_SLASH);
+        }
 
         System.out.println("Fishing finished");
     }
