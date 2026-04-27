@@ -2,7 +2,6 @@ package vinneg.natpoacher;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -19,8 +18,8 @@ public class Main extends Application {
         primaryStage.setAlwaysOnTop(true);
         primaryStage.setTitle("Nat Poacher");
         primaryStage.initStyle(StageStyle.UTILITY);
-        primaryStage.setX(1800);
-        primaryStage.setY(220);
+        primaryStage.setX(2300);
+        primaryStage.setY(300);
 
         // Создаём контейнер для элементов (вертикальная компоновка)
         VBox root = new VBox(10); // 10 — отступ между элементами
@@ -31,41 +30,43 @@ public class Main extends Application {
         secondaryStage.setTitle("Secondary Window");
         secondaryStage.initStyle(StageStyle.UTILITY);
         secondaryStage.initOwner(primaryStage);
-        secondaryStage.setX(870);
-        secondaryStage.setY(80);
+        secondaryStage.setX(1170);
+        secondaryStage.setY(160);
         secondaryStage.setOpacity(0.4); // непрозрачность
-        secondaryStage.setWidth(800);
-        secondaryStage.setHeight(400);
+        secondaryStage.setWidth(1100);
+        secondaryStage.setHeight(500);
 
-        // Создаём первую кнопку
-        Button button1 = new Button("FISH");
-        button1.setPrefSize(120, 40);
-        button1.setOnAction(e -> {
-            int x = (int) secondaryStage.getX();
-            int y = (int) secondaryStage.getY();
-            int width = (int) secondaryStage.getWidth();
-            int height = (int) secondaryStage.getHeight();
+        ToggleButton startButton = new ToggleButton("START");
+        startButton.setPrefSize(120, 120);
+        startButton.setOnAction(event -> {
+            if (startButton.isSelected()) {
+                // При первом нажатии — открываем окно
+                startButton.setText("STOP");
 
-            System.out.println("win " + x + "-" + y + " " + width + "-" + height);
+                int x = (int) secondaryStage.getX();
+                int y = (int) secondaryStage.getY();
+                int width = (int) secondaryStage.getWidth();
+                int height = (int) secondaryStage.getHeight();
 
-            try {
-                Worker.start(new Clicker(x, y, width, height));
-            } catch (AWTException | NoSuchAlgorithmException ignore) {
+                System.out.println("win " + x + "-" + y + " " + width + "-" + height);
+
+                try {
+                    Worker.start(new Clicker(x, y, width, height));
+                } catch (AWTException | NoSuchAlgorithmException ignore) {
+                }
+            } else {
+                // При втором нажатии — закрываем окно
+                startButton.setText("START");
+
+                Worker.stop();
             }
         });
-
-        // Создаём вторую кнопку
-        Button button2 = new Button("STOP");
-        button2.setPrefSize(120, 120);
-        button2.setOnAction(e -> Worker.stop());
 
         primaryStage.setOnCloseRequest(e -> Worker.stop());
 
         // Создаём toggle‑кнопку для управления дополнительным окном
         ToggleButton toggleWindowButton = new ToggleButton("OPEN WINDOW");
         toggleWindowButton.setPrefSize(120, 40);
-
-        // Обработчик для toggle‑кнопки
         toggleWindowButton.setOnAction(event -> {
             if (toggleWindowButton.isSelected()) {
                 // При первом нажатии — открываем окно
@@ -79,7 +80,7 @@ public class Main extends Application {
         });
 
         // Добавляем кнопки в контейнер
-        root.getChildren().addAll(button1, button2, toggleWindowButton);
+        root.getChildren().addAll(startButton, toggleWindowButton);
 
         // Создаём сцену с контейнером
         Scene scene = new Scene(root);
