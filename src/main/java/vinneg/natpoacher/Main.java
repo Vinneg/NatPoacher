@@ -30,10 +30,10 @@ public class Main extends Application {
         secondaryStage.setTitle("Secondary Window");
         secondaryStage.initStyle(StageStyle.UTILITY);
         secondaryStage.initOwner(primaryStage);
-        secondaryStage.setX(1170);
+        secondaryStage.setX(1370);
         secondaryStage.setY(160);
         secondaryStage.setOpacity(0.4); // непрозрачность
-        secondaryStage.setWidth(1100);
+        secondaryStage.setWidth(700);
         secondaryStage.setHeight(500);
 
         ToggleButton startButton = new ToggleButton("START");
