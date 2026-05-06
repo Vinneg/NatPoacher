@@ -3,9 +3,6 @@ package vinneg.natpoacher;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import static vinneg.natpoacher.Seeker.RATIO;
-import static vinneg.natpoacher.Seeker.THRESHOLD;
-
 public class Bobber {
 
     public static final int SIDE = 2 * Seeker.R + 1;
@@ -42,10 +39,8 @@ public class Bobber {
             for (int x = 0; x < SIDE; x++) {
                 int rgb = image.getRGB(x, y);
                 int red = (rgb >> 16) & 0xFF;
-                int green = (rgb >> 8) & 0xFF;
-                int blue = rgb & 0xFF;
 
-                if (red > THRESHOLD && red > green * RATIO && red > blue * RATIO) {
+                if (Seeker.test(rgb)) {
                     ttl += red;
                     c++;
                 }

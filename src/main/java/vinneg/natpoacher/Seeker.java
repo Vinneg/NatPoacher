@@ -41,15 +41,21 @@ public class Seeker {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int rgb = image.getRGB(x, y);
-                int red = (rgb >> 16) & 0xFF;
-                int green = (rgb >> 8) & 0xFF;
-                int blue = rgb & 0xFF;
 
-                if (red > THRESHOLD && red > green * RATIO && red > blue * RATIO) {
+                if (test(rgb)) {
                     candidates.add(new Pixel(x, y));
                 }
             }
         }
+    }
+
+    public static boolean test(int rgb) {
+        int red = (rgb >> 16) & 0xFF;
+        int green = (rgb >> 8) & 0xFF;
+        int blue = rgb & 0xFF;
+
+//        return red > THRESHOLD && red > green * RATIO && red > blue * RATIO;
+        return red > green * RATIO && red > blue * RATIO;
     }
 
     public Pixel central() {
