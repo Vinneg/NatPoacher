@@ -9,7 +9,7 @@ public class Seeker {
     public static final int R = 20;
 
     public static final double RATIO = 1.2;
-    public static final int THRESHOLD = 30;
+    public static int threshold = 35;
     private final List<Pixel> candidates = new LinkedList<>();
     private final BufferedImage image;
     private int cx;
@@ -47,6 +47,11 @@ public class Seeker {
                 }
             }
         }
+
+        if (candidates.size() < 5 && threshold > 5) {
+            threshold -= 5;
+            fill();
+        }
     }
 
     public static boolean test(int rgb) {
@@ -54,8 +59,8 @@ public class Seeker {
         int green = (rgb >> 8) & 0xFF;
         int blue = rgb & 0xFF;
 
-//        return red > THRESHOLD && red > green * RATIO && red > blue * RATIO;
-        return red > green * RATIO && red > blue * RATIO;
+        return red > threshold && red > green * RATIO && red > blue * RATIO;
+//        return red > green * RATIO && red > blue * RATIO;
     }
 
     public Pixel central() {
