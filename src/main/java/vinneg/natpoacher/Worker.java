@@ -36,7 +36,7 @@ public class Worker implements Runnable {
                 clicker.key(KeyEvent.VK_SEMICOLON);
                 clicker.delay(BUFF_CAST);
 
-                nextLure = currentTimeMillis() + BUFF_DURATION + 3_000;
+                nextLure = currentTimeMillis() + BUFF_DURATION + 6_000;
 
                 clicker.delay(1_000);
             }

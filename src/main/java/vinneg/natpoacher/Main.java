@@ -13,7 +13,7 @@ import java.security.NoSuchAlgorithmException;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws NoSuchAlgorithmException {
+    public void start(Stage primaryStage) {
         // Заголовок окна
         primaryStage.setAlwaysOnTop(true);
         primaryStage.setTitle("Nat Poacher");

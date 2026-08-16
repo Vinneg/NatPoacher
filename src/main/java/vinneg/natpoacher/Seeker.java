@@ -9,7 +9,7 @@ public class Seeker {
     public static final int R = 20;
 
     public static final double RATIO = 1.2;
-    public static int threshold = 35;
+    public static int threshold = 30;
     private final List<Pixel> candidates = new LinkedList<>();
     private final BufferedImage image;
     private int cx;
