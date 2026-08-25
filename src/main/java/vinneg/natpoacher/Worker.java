@@ -14,7 +14,7 @@ public class Worker implements Runnable {
     private static long nextLure = 0;
 
     private static final int BUFF_DURATION = 600_000;
-    private static final int LURE_DURATION = 22_000;
+    private static final int LURE_DURATION = 21_000;
     private static final int BUFF_CAST = 6_000 + 100;
 
     public Clicker clicker;
