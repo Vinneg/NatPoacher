@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 public class Bobber {
 
     public static final int SIDE = 2 * Seeker.R + 1;
-    private static final int DIFF = 13;
 
     public final Clicker clicker;
 
@@ -14,6 +13,7 @@ public class Bobber {
     public final int y;
     public final Rectangle area;
     public int redness;
+    private static int delta = 12;
 
     public Bobber(Clicker clicker) {
         this.clicker = clicker;
@@ -27,6 +27,11 @@ public class Bobber {
         this.area = new Rectangle(x - Seeker.R, y - Seeker.R, SIDE, SIDE);
 
         redness = getRedness();
+    }
+
+    public static void decDelta() {
+        delta -= delta > 5 ? 1 : 0;
+        System.out.println("Bobber delta = " + delta);
     }
 
     private int getRedness() {
@@ -53,10 +58,10 @@ public class Bobber {
     public boolean still() {
         int cur = getRedness();
         int diff = cur - redness;
-        boolean res = -DIFF <= diff && diff <= DIFF;
+        boolean res = -delta <= diff && diff <= delta;
 
         if (!res) {
-            System.out.println("Bobber triggered with redness " + cur);
+//            System.out.println("Bobber triggered with redness " + cur);
         }
 
         return res;

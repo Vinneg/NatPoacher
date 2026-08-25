@@ -90,7 +90,7 @@ public class Worker implements Runnable {
             // bobber found
             Bobber bobber = new Bobber(clicker);
 
-            System.out.println("Bobber found with redness " + bobber.redness);
+//            System.out.println("Bobber found with redness " + bobber.redness);
 
             long et = currentTimeMillis() + LURE_DURATION;
             boolean bite = false;
@@ -107,7 +107,8 @@ public class Worker implements Runnable {
             if (bite) {
                 clicker.click();
             } else {
-                System.out.println("Bobber not triggered");
+                Bobber.decDelta();
+//                System.out.println("Bobber not triggered");
             }
 
             if (Thread.currentThread().isInterrupted()) {
