@@ -77,14 +77,14 @@ public class Worker implements Runnable {
 
                 clicker.delay(500);
 
+                if (noBobber.getPlain() > 35) {
+                    System.out.println("Bobber not found 25 times in a row. Exit");
+                    return;
+                }
+
                 continue;
             } else {
                 noBobber.set(0);
-            }
-
-            if (noBobber.getPlain() > 25) {
-                System.out.println("Bobber not found 25 times in a row. Exit");
-                return;
             }
 
             // bobber found

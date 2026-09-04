@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Seeker {
 
-    public static final int R = 20;
+    public static final int R = 15;
 
     public static final double RATIO = 1.2;
     public static int threshold = 60;

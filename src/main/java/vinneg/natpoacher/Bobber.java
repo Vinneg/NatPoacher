@@ -30,7 +30,7 @@ public class Bobber {
     }
 
     public static void decDelta() {
-        delta -= delta > 5 ? 1 : 0;
+        delta -= delta > 12 ? 1 : 0;
         System.out.println("Bobber delta = " + delta);
     }
 
