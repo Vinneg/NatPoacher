@@ -1,0 +1,34 @@
+.root {
+    -fx-padding: 5;
+    -fx-background-color: #000000;
+    -fx-border-color: #1a1a1a;
+    -fx-border-width: 1;
+    -fx-border-insets: 1;
+}
+
+.label {
+    -fx-background-color: #000000;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-text-fill: #3c3c3c;
+}
+
+.button, .toggle-button {
+    -fx-background-color: #0a0a0a;
+    -fx-border-color: #1a1a1a;
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-alignment: center;
+    -fx-text-fill: #3c3c3c;
+}
+
+.button:selected, .toggle-button:selected {
+    -fx-background-color: #0a0a0a;
+    -fx-border-color: #182133;
+    -fx-text-fill: #25324d;
+}
+
+.button:hover, .toggle-button:hover {
+    -fx-background-color: #182133;
+}
