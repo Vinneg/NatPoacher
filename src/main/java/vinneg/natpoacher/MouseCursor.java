@@ -11,7 +11,8 @@ public class MouseCursor {
         System.load("D:\\Java\\NatPoacher\\src\\main\\resources\\jni\\MouseCursorLib.dll");
     }
 
-    public static final String GEAR = "8418d5732c16c2de99b84c79b4c05a6b";
+    public static final String GEAR1 = "8418d5732c16c2de99b84c79b4c05a6b";
+    public static final String GEAR2 = "123";
 
     // Нативный метод возвращает байтовый массив с изображением курсора
     public native byte[] getCursor();
@@ -21,7 +22,8 @@ public class MouseCursor {
     }
 
     public boolean isGear() {
-        return GEAR.equals(getMD5Hash());
+        final var hash = getMD5Hash();
+        return GEAR1.equals(hash) || GEAR2.equals(hash);
     }
 
     private String getMD5Hash() {
@@ -35,14 +37,11 @@ public class MouseCursor {
         for (byte b : bbs) {
             sb.append(String.format("%02x", b & 0xff)); // & 0xff чтобы избежать отрицательного значения
         }
-        return sb.toString();
-    }
 
-    static void main(String[] args) throws NoSuchAlgorithmException {
-        MouseCursor cursor = new MouseCursor();
-        String hash = cursor.getMD5Hash();
+        var res = sb.toString();
+        System.out.println(res);
 
-        System.out.println(hash);
+        return res;
     }
 
 }
