@@ -46,6 +46,8 @@ public class Seeker {
 
         if (candidates.size() < 5 && threshold > 5) {
             threshold -= 5;
+            candidates.clear();
+
             fill();
         }
     }

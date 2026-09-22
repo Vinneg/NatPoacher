@@ -12,8 +12,8 @@ public class Bobber {
     public final int x;
     public final int y;
     public final Rectangle area;
-    public int redness;
-    private static int delta = 12;
+    public long redness;
+    private static int delta = 4_500;
 
     public Bobber(Clicker clicker) {
         this.clicker = clicker;
@@ -34,11 +34,10 @@ public class Bobber {
         System.out.println("Bobber delta = " + delta);
     }
 
-    private int getRedness() {
+    private long getRedness() {
         BufferedImage image = clicker.bobber(this);
 
         long ttl = 0;
-        long c = 0;
 
         for (int y = 0; y < SIDE; y++) {
             for (int x = 0; x < SIDE; x++) {
@@ -47,21 +46,21 @@ public class Bobber {
 
                 if (Seeker.test(rgb)) {
                     ttl += red;
-                    c++;
                 }
             }
         }
 
-        return c == 0 ? 0 : (int) (ttl / c);
+        return ttl;
     }
 
     public boolean still() {
-        int cur = getRedness();
-        int diff = cur - redness;
+        long cur = getRedness();
+        long diff = cur - redness;
         boolean res = -delta <= diff && diff <= delta;
 
         if (!res) {
-//            System.out.println("Bobber triggered with redness " + cur);
+            redness = cur;
+            System.out.println("Bobber triggered with redness " + cur + " and diff " + diff);
         }
 
         return res;
