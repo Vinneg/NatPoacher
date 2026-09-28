@@ -12,7 +12,7 @@ public class MouseCursor {
     }
 
     public static final String GEAR1 = "8418d5732c16c2de99b84c79b4c05a6b";
-    public static final String GEAR2 = "123";
+    public static final String GEAR2 = "83381c0cc89836ed2d35ea3cd6f1031f";
 
     // Нативный метод возвращает байтовый массив с изображением курсора
     public native byte[] getCursor();
@@ -37,11 +37,7 @@ public class MouseCursor {
         for (byte b : bbs) {
             sb.append(String.format("%02x", b & 0xff)); // & 0xff чтобы избежать отрицательного значения
         }
-
-        var res = sb.toString();
-        System.out.println(res);
-
-        return res;
+        return sb.toString();
     }
 
 }

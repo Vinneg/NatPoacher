@@ -8,6 +8,10 @@ public class Seeker {
 
     public static final int R = 15;
 
+    // dun morogh
+//    public static final double RATIO = 1.01;
+//    public static int threshold = 10;
+    // basic
     public static final double RATIO = 1.2;
     public static int threshold = 60;
     private final List<Pixel> candidates = new LinkedList<>();

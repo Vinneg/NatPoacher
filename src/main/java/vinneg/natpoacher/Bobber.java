@@ -31,7 +31,7 @@ public class Bobber {
 
     public static void decDelta() {
         delta -= delta > 12 ? 1 : 0;
-        System.out.println("Bobber delta = " + delta);
+//        System.out.println("Bobber delta = " + delta);
     }
 
     private int getRedness() {
