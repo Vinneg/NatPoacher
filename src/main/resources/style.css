@@ -6,6 +6,10 @@
     -fx-border-insets: 1;
 }
 
+.pane {
+    -fx-background-color: #000000;
+}
+
 .label {
     -fx-background-color: #000000;
     -fx-font-weight: bold;
