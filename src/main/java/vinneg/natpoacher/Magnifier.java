@@ -1,102 +1,66 @@
 package vinneg.natpoacher;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.UUID;
 
-public class Magnifier {
+import static vinneg.natpoacher.Bobber.SIDE;
 
-    private final Stage stage;
-    private final ImageView imageView;
+public class Magnifier implements Runnable {
+
+    private static Thread main;
+
+    private Stage magni;
+    private ImageView view;
     private final Robot robot;
-    private boolean isRunning = false;
 
-    public Magnifier() {
-        imageView = new ImageView();
-        imageView.setFitWidth(100);
-        imageView.setFitHeight(100);
-        imageView.setPreserveRatio(true);
+    public Magnifier(Stage magni, ImageView view) throws AWTException {
+        this.magni = magni;
+        this.view = view;
+        this.robot = new Robot();
+    }
 
-        stage = new Stage(StageStyle.UNDECORATED);
-        stage.setWidth(100);
-        stage.setHeight(100);
-        stage.setOpacity(0.8);
-        stage.setAlwaysOnTop(true);
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()) {
+            int x = (int) magni.getX();
+            int y = (int) magni.getY();
 
-//        Scene scene = new Scene(imageView, Color.TRANSPARENT);
-//        scene.setFill(Color.TRANSPARENT);
-//        stage.setScene(scene);
+            Rectangle rect = new Rectangle(x + SIDE, y + SIDE, SIDE * 2, SIDE * 2 + 1);
 
-        try {
-            robot = new Robot();
-        } catch (java.awt.AWTException e) {
-            throw new RuntimeException(e);
+            BufferedImage img = robot.createScreenCapture(rect);
+//            img.getScaledInstance(SIDE * 2, SIDE * 2, Image.SCALE_SMOOTH)
+            javafx.scene.image.Image scaled = SwingFXUtils.toFXImage(img, null);
+            view.setImage(scaled);
         }
     }
 
-    public void show() {
-        if (isRunning) return;
-        isRunning = true;
-        stage.show();
-        startLoop();
+    public static void start(Stage magni, ImageView view) throws AWTException {
+        if (main == null) {
+            Magnifier magnifier = new Magnifier(magni, view);
+
+            main = new Thread(magnifier, UUID.randomUUID().toString());
+        }
+
+        main.start();
     }
 
-    public void hide() {
-        isRunning = false;
-        stage.hide();
-    }
+    public static void stop() {
+        if (main == null) {
+            return;
+        }
 
-    private void startLoop() {
-//        new Thread(() -> {
-//            while (isRunning) {
-//                try {
-//                    // Получаем координаты курсора на экране
-//                    Point mouse = robot.();
-//
-//                    if (mouse == null) {
-//                        Thread.sleep(50);
-//                        continue;
-//                    }
-//
-//                    int x = (int) stage.getX();
-//                    int y = (int) stage.getY();
-//
-//                    // Область для захвата: 25×25 пикселей (чтобы после ×4 было 100×100)
-//                    int size = 25;
-//                    Rectangle2D captureRect = new Rectangle2D(x - size / 2, y - size / 2, size, size);
-//
-//                    // Захват экрана (Java AWT)
-//                    java.awt.Rectangle awtRect = new java.awt.Rectangle(
-//                            (int) captureRect.getMinX(),
-//                            (int) captureRect.getMinY(),
-//                            (int) captureRect.getWidth(),
-//                            (int) captureRect.getHeight()
-//                    );
-//                    java.awt.image.BufferedImage bufferedImage = robot.createScreenCapture(awtRect);
-//
-//                    // Конвертируем в JavaFX Image
-//                    javafx.scene.image.Image fxImage = new javafx.scene.image.Image(
-//                            bufferedImage.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH)
-//                                    .getSource() // упрощённо: можно сделать через PixelWriter, но это быстрее для примера
-//                    );
-//
-//                    // Более корректный способ конвертации (без потери качества и без getSource)
-//                    fxImage = convertBufferedImageToFXImage(bufferedImage);
-//
-//                    imageView.setImage(fxImage);
-//
-//                    // Позиционируем окно лупы рядом с курсором
-//                    stage.setX(mouse.x + 20);
-//                    stage.setY(mouse.y + 20);
-//
-//                    Thread.sleep(30); // 30 мс ~ 33 FPS
-//                } catch (InterruptedException | java.awt.AWTException e) {
-//                    isRunning = false;
-//                }
-//            }
-//        }).start();
+        try {
+            main.interrupt();
+            main.join(3 * 1_000); // ждём до 3 сек
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            main = null;
+        }
     }
 
 }

@@ -10,6 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -25,31 +26,37 @@ public class Main extends Application {
     private double magniX;
     private double magniY;
 
+    private double mainX;
+    private double mainY;
+
     @Override
     public void start(Stage main) {
         Optional<String> ext = Optional.of(getClass())
                 .map(v -> v.getResource("/style.css"))
                 .map(URL::toExternalForm);
 
-        Circle dot = new Circle(SIDE, SIDE, 3, Color.AZURE);
-        Polygon rack = new Polygon(new int[SIDE], new int[SIDE], 4);
+        Circle dot = new Circle(SIDE * 2, SIDE * 2, 3, Color.AZURE);
+        Rectangle rack = new Rectangle(SIDE, SIDE, SIDE * 2 + 1, SIDE * 2 + 1);
+        rack.setFill(null);
+        rack.setStroke(Color.AZURE);
+        rack.setStrokeWidth(1);
 
         ImageView img = new ImageView();
-        img.setFitWidth(100);
-        img.setFitHeight(100);
+        img.setFitWidth(SIDE * 4 + 1);
+        img.setFitHeight(SIDE * 4 + 1);
         img.setPreserveRatio(true);
 
         Pane magniRoot = new Pane();
         magniRoot.setStyle("-fx-border-color: black; -fx-border-width: 1;");
-        magniRoot.getChildren().addAll(dot, rack, img);
+        magniRoot.getChildren().addAll(img, dot, rack);
 
-        Scene magniScene = new Scene(magniRoot, 100, 100);
+        Scene magniScene = new Scene(magniRoot, SIDE * 4 + 1, SIDE * 4 + 1);
         ext.ifPresent(magniScene.getStylesheets()::add);
 
         Stage magni = new Stage(StageStyle.UNDECORATED);
         magni.setScene(magniScene);
-        magni.setWidth(SIDE * 2);
-        magni.setHeight(SIDE * 2);
+        magni.setWidth(SIDE * 4 + 1);
+        magni.setHeight(SIDE * 4 + 1);
         magni.setOpacity(0.3);
         magni.setAlwaysOnTop(true);
 
@@ -73,6 +80,15 @@ public class Main extends Application {
         slave.setHeight(500);
 
         VBox root = new VBox(10);
+
+        root.setOnMousePressed(e -> {
+            mainX = e.getScreenX() - main.getX();
+            mainY = e.getScreenY() - main.getY();
+        });
+        root.setOnMouseDragged(e -> {
+            main.setX(e.getScreenX() - mainX);
+            main.setY(e.getScreenY() - mainY);
+        });
 
         Label title = new Label("Nat Poacher");
         title.setPrefSize(120, 20);
@@ -116,8 +132,16 @@ public class Main extends Application {
         magnify.setOnAction(e -> {
             if (magnify.isSelected()) {
                 magni.show();
+
+                try {
+                    Magnifier.start(magni, img);
+                } catch (AWTException _) {
+                    magni.hide();
+                    Magnifier.stop();
+                }
             } else {
                 magni.hide();
+                Magnifier.stop();
             }
         });
 
@@ -128,6 +152,7 @@ public class Main extends Application {
             magni.close();
             main.close();
             Worker.stop();
+            Magnifier.stop();
         });
 
         root.getChildren().addAll(title, start, aim, magnify, close);
