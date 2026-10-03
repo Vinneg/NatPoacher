@@ -6,7 +6,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -29,8 +31,41 @@ public class Main extends Application {
     private double mainX;
     private double mainY;
 
+    private Stage slave;
+    private Stage magni;
+    private Stage over;
+
     @Override
     public void start(Stage main) {
+        var overPane = new StackPane();
+        overPane.setOpacity(0.1);
+
+        Scene overScene = new Scene(overPane, Color.TRANSPARENT);
+        overScene.setFill(Color.TRANSPARENT);
+
+        overScene.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            int x = (int) event.getScreenX();
+            int y = (int) event.getScreenY();
+
+            try {
+                Robot robot = new Robot();
+
+                magni.hide();
+                over.hide();
+
+                Optional.of(new java.awt.Rectangle(x - Seeker.R, y - Seeker.R, SIDE, SIDE))
+                        .map(robot::createScreenCapture)
+                        .ifPresent(Seeker::define);
+            } catch (AWTException _) {
+            }
+        });
+
+        over = new Stage();
+        over.initStyle(StageStyle.TRANSPARENT);
+        over.setFullScreen(true);
+        over.setAlwaysOnTop(true);
+        over.setScene(overScene);
+
         Optional<String> ext = Optional.of(getClass())
                 .map(v -> v.getResource("/style.css"))
                 .map(URL::toExternalForm);
@@ -53,11 +88,10 @@ public class Main extends Application {
         Scene magniScene = new Scene(magniRoot, SIDE * 4 + 1, SIDE * 4 + 1);
         ext.ifPresent(magniScene.getStylesheets()::add);
 
-        Stage magni = new Stage(StageStyle.UNDECORATED);
+        magni = new Stage(StageStyle.UNDECORATED);
         magni.setScene(magniScene);
         magni.setWidth(SIDE * 4 + 1);
         magni.setHeight(SIDE * 4 + 1);
-        magni.setOpacity(0.3);
         magni.setAlwaysOnTop(true);
 
         magniRoot.setOnMousePressed(e -> {
@@ -69,7 +103,7 @@ public class Main extends Application {
             magni.setY(e.getScreenY() - magniY);
         });
 
-        Stage slave = new Stage();
+        slave = new Stage();
         slave.setTitle("Secondary Window");
         slave.initStyle(StageStyle.UTILITY);
         slave.initOwner(main);
@@ -132,15 +166,18 @@ public class Main extends Application {
         magnify.setOnAction(e -> {
             if (magnify.isSelected()) {
                 magni.show();
+                over.show();
 
                 try {
                     Magnifier.start(magni, img);
                 } catch (AWTException _) {
                     magni.hide();
+                    over.hide();
                     Magnifier.stop();
                 }
             } else {
                 magni.hide();
+                over.hide();
                 Magnifier.stop();
             }
         });
@@ -150,6 +187,7 @@ public class Main extends Application {
         close.setOnAction(_ -> {
             slave.close();
             magni.close();
+            over.close();
             main.close();
             Worker.stop();
             Magnifier.stop();
@@ -170,6 +208,15 @@ public class Main extends Application {
         main.setOnCloseRequest(_ -> Worker.stop());
 
         main.show();
+    }
+
+    @Override
+    public void stop() {
+        slave.close();
+        magni.close();
+        over.close();
+        Worker.stop();
+        Magnifier.stop();
     }
 
     static void main(String[] args) {

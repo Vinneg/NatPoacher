@@ -26,15 +26,18 @@ public class Magnifier implements Runnable {
 
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
-            int x = (int) magni.getX();
-            int y = (int) magni.getY();
+            Point location = MouseInfo.getPointerInfo().getLocation();
 
-            Rectangle rect = new Rectangle(x + SIDE, y + SIDE, SIDE * 2, SIDE * 2 + 1);
+            int x = (int) location.getX();
+            int y = (int) location.getY();
+
+            Rectangle rect = new Rectangle(x - SIDE, y - SIDE, SIDE * 2 + 1, SIDE * 2 + 1);
 
             BufferedImage img = robot.createScreenCapture(rect);
-//            img.getScaledInstance(SIDE * 2, SIDE * 2, Image.SCALE_SMOOTH)
-            javafx.scene.image.Image scaled = SwingFXUtils.toFXImage(img, null);
-            view.setImage(scaled);
+            view.setImage(SwingFXUtils.toFXImage(img, null));
+
+            magni.setX(x + SIDE / 2);
+            magni.setY(y + SIDE / 2);
         }
     }
 

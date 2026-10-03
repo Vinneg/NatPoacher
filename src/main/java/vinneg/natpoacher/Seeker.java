@@ -3,6 +3,7 @@ package vinneg.natpoacher;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class Seeker {
 
@@ -12,7 +13,7 @@ public class Seeker {
 //    public static final double RATIO = 1.01;
 //    public static int threshold = 10;
     // basic
-    public static final double RATIO = 1.2;
+    public static double ratio = 1.2;
     public static int threshold = 60;
     private final List<Pixel> candidates = new LinkedList<>();
     private final BufferedImage image;
@@ -59,7 +60,7 @@ public class Seeker {
         int green = (rgb >> 8) & 0xFF;
         int blue = rgb & 0xFF;
 
-        return red > threshold && red > green * RATIO && red > blue * RATIO;
+        return red > threshold && red > green * ratio && red > blue * ratio;
 //        return red > green * RATIO && red > blue * RATIO;
     }
 
@@ -196,6 +197,52 @@ public class Seeker {
             return false;
         }
 
+    }
+
+    public static void define(BufferedImage img) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+
+        List<Integer> candidates = new LinkedList<>();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int rgb = img.getRGB(x, y);
+
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                if (red > green && red > blue) {
+                    candidates.add(rgb);
+                }
+            }
+        }
+
+        List<Integer> filtered = candidates.stream()
+                .sorted((l, r) -> ((r >> 16) & 0xFF) - ((l >> 16) & 0xFF))
+                .skip(candidates.size() / 3)
+                .toList();
+
+        Optional.of(filtered)
+                .map(List::getFirst)
+                .map(v -> (v >> 16) & 0xFF)
+                .ifPresent(v -> threshold = v);
+
+        System.out.println(threshold);
+
+        filtered.stream()
+                .map(v -> {
+                    int red = (v >> 16) & 0xFF;
+                    int green = (v >> 8) & 0xFF;
+                    int blue = v & 0xFF;
+
+                    return Math.min((double)red / green, (double)red / blue);
+                }).sorted()
+                .findFirst()
+                .ifPresent(v -> ratio = v);
+
+        System.out.println(ratio);
     }
 
 }
