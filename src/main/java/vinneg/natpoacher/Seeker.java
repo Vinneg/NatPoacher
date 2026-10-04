@@ -11,12 +11,8 @@ public class Seeker {
 
     public static final int R = 15;
 
-    // dun morogh
-//    public static final double RATIO = 1.01;
-//    public static int threshold = 10;
-    // basic
-    public static double ratio = 1.2;
-    public static int threshold = 60;
+    public static double ratio = 1.9;
+    public static int threshold = 120;
     private final List<Pixel> candidates = new LinkedList<>();
     private final BufferedImage image;
     private int cx;
@@ -215,7 +211,7 @@ public class Seeker {
                 int green = (rgb >> 8) & 0xFF;
                 int blue = rgb & 0xFF;
 
-                if (red > green && red > blue) {
+                if (red > green * 1.9 && red > blue * 1.9) {
                     candidates.add(rgb);
                 }
             }
@@ -239,7 +235,7 @@ public class Seeker {
                     int green = (v >> 8) & 0xFF;
                     int blue = v & 0xFF;
 
-                    return Math.min((double)red / green, (double)red / blue);
+                    return Math.min((double) red / green, (double) red / blue);
                 }).sorted()
                 .findFirst()
                 .ifPresent(v -> ratio = v);

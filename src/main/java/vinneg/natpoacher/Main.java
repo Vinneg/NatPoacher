@@ -7,9 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -36,6 +34,7 @@ public class Main extends Application {
     private ToggleButton start;
     private ToggleButton aim;
     private ToggleButton magnify;
+    private Label tar;
     private Button close;
 
     private Stage slave;
@@ -53,9 +52,12 @@ public class Main extends Application {
             yOffset = (int) secOffset.getMinY();
         }
 
+        Label tar = new Label();
+        tar.setPrefSize(120, 20);
+
         ImageView peep = new ImageView();
-        peep.setFitWidth(SIDE * 4 + 1);
-        peep.setFitHeight(SIDE * 4 + 1);
+        peep.setFitWidth(120);
+        peep.setFitHeight(120);
         peep.setPreserveRatio(false);
 
         var overPane = new StackPane();
@@ -78,6 +80,12 @@ public class Main extends Application {
                 Optional.of(new java.awt.Rectangle(x - Seeker.R, y - Seeker.R, SIDE, SIDE))
                         .map(robot::createScreenCapture)
                         .ifPresent(Seeker::define);
+
+                Optional.of(Seeker.threshold)
+                        .map(v -> Color.color((double) v / 256, v / Seeker.ratio / 256, v / Seeker.ratio / 256))
+                        .map(v -> new BackgroundFill(v, CornerRadii.EMPTY, null))
+                        .map(Background::new)
+                        .ifPresent(tar::setBackground);
             } catch (AWTException _) {
             }
         });
@@ -150,7 +158,7 @@ public class Main extends Application {
         title.setPrefSize(120, 20);
 
         start = new ToggleButton("START");
-        start.setPrefSize(120, 120);
+        start.setPrefSize(120, 90);
         start.setOnAction(_ -> {
             if (start.isSelected()) {
                 start.setText("STOP");
@@ -215,7 +223,7 @@ public class Main extends Application {
             Magnifier.stop();
         });
 
-        root.getChildren().addAll(title, start, aim, peep, magnify, close);
+        root.getChildren().addAll(title, start, aim, peep, tar, magnify, close);
 
         Scene mainScene = new Scene(root);
         ext.ifPresent(mainScene.getStylesheets()::add);
@@ -230,6 +238,12 @@ public class Main extends Application {
         main.setOnCloseRequest(_ -> Worker.stop());
 
         main.show();
+
+        Optional.of(Seeker.threshold)
+                .map(v -> Color.color((double) v / 256, v / Seeker.ratio / 256, v / Seeker.ratio / 256))
+                .map(v -> new BackgroundFill(v, CornerRadii.EMPTY, null))
+                .map(Background::new)
+                .ifPresent(tar::setBackground);
     }
 
     @Override

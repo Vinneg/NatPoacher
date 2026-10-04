@@ -2,7 +2,7 @@ package vinneg.natpoacher;
 
 public class Log {
 
-    public static boolean enable = false;
+    public static boolean enable = true;
 
     public static void log(String s) {
         if (!enable) return;

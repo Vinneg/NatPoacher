@@ -19,7 +19,6 @@ public class Bobber {
     public final int y;
     public final Rectangle area;
     public int redness;
-    private static int delta = 12;
 
     public Bobber(Clicker clicker, ImageView peep) {
         this.clicker = clicker;
@@ -40,32 +39,27 @@ public class Bobber {
         BufferedImage image = clicker.bobber(this);
         peep.setImage(SwingFXUtils.toFXImage(image, null));
 
-        long ttl = 0;
-        long c = 0;
+        int c = 0;
 
         for (int y = 0; y < SIDE; y++) {
             for (int x = 0; x < SIDE; x++) {
-                int rgb = image.getRGB(x, y);
-                int red = (rgb >> 16) & 0xFF;
-
-                if (Seeker.test(rgb)) {
-                    ttl += red;
-                    c++;
-                }
+                c += Seeker.test(image.getRGB(x, y)) ? 1 : 0;
             }
         }
 
-        return c == 0 ? 0 : (int) (ttl / c);
+        return c;
     }
 
     public boolean still() {
         int cur = getRedness();
-        int diff = cur - redness;
-        boolean res = -delta <= diff && diff <= delta;
+        double r = ((double) cur) / redness;
+        boolean res = 0.5 <= r && r <= 1.5;
 
         if (!res) {
             log("Bobber triggered with redness %d", cur);
         }
+
+        redness = cur;
 
         return res;
     }
