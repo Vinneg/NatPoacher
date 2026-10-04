@@ -1,13 +1,19 @@
 package vinneg.natpoacher;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.ImageView;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+
+import static vinneg.natpoacher.Log.log;
 
 public class Bobber {
 
     public static final int SIDE = 2 * Seeker.R + 1;
 
     public final Clicker clicker;
+    public final ImageView peep;
 
     public final int x;
     public final int y;
@@ -15,8 +21,9 @@ public class Bobber {
     public int redness;
     private static int delta = 12;
 
-    public Bobber(Clicker clicker) {
+    public Bobber(Clicker clicker, ImageView peep) {
         this.clicker = clicker;
+        this.peep = peep;
 
         Point cp = MouseInfo.getPointerInfo()
                 .getLocation();
@@ -29,13 +36,9 @@ public class Bobber {
         redness = getRedness();
     }
 
-    public static void decDelta() {
-        delta -= delta > 12 ? 1 : 0;
-//        System.out.println("Bobber delta = " + delta);
-    }
-
     private int getRedness() {
         BufferedImage image = clicker.bobber(this);
+        peep.setImage(SwingFXUtils.toFXImage(image, null));
 
         long ttl = 0;
         long c = 0;
@@ -61,7 +64,7 @@ public class Bobber {
         boolean res = -delta <= diff && diff <= delta;
 
         if (!res) {
-//            System.out.println("Bobber triggered with redness " + cur);
+            log("Bobber triggered with redness %d", cur);
         }
 
         return res;

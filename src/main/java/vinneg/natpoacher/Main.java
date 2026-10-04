@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -22,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 import static vinneg.natpoacher.Bobber.SIDE;
+import static vinneg.natpoacher.Log.log;
 
 public class Main extends Application {
 
@@ -31,12 +33,31 @@ public class Main extends Application {
     private double mainX;
     private double mainY;
 
+    private ToggleButton start;
+    private ToggleButton aim;
+    private ToggleButton magnify;
+    private Button close;
+
     private Stage slave;
     private Stage magni;
     private Stage over;
 
     @Override
     public void start(Stage main) {
+        var xOffset = 0;
+        var yOffset = 0;
+        final var screens = Screen.getScreens();
+        if (screens.size() > 1) {
+            var secOffset = screens.get(1).getVisualBounds();
+            xOffset = (int) secOffset.getMinX();
+            yOffset = (int) secOffset.getMinY();
+        }
+
+        ImageView peep = new ImageView();
+        peep.setFitWidth(SIDE * 4 + 1);
+        peep.setFitHeight(SIDE * 4 + 1);
+        peep.setPreserveRatio(false);
+
         var overPane = new StackPane();
         overPane.setOpacity(0.1);
 
@@ -52,6 +73,7 @@ public class Main extends Application {
 
                 magni.hide();
                 over.hide();
+                magnify.setSelected(false);
 
                 Optional.of(new java.awt.Rectangle(x - Seeker.R, y - Seeker.R, SIDE, SIDE))
                         .map(robot::createScreenCapture)
@@ -127,7 +149,7 @@ public class Main extends Application {
         Label title = new Label("Nat Poacher");
         title.setPrefSize(120, 20);
 
-        ToggleButton start = new ToggleButton("START");
+        start = new ToggleButton("START");
         start.setPrefSize(120, 120);
         start.setOnAction(_ -> {
             if (start.isSelected()) {
@@ -138,10 +160,10 @@ public class Main extends Application {
                 int width = (int) slave.getWidth();
                 int height = (int) slave.getHeight();
 
-                System.out.println("win " + x + "-" + y + " " + width + "-" + height);
+                log("win %d-%d %d-%d", x, y, width, height);
 
                 try {
-                    Worker.start(new Clicker(x, y, width, height));
+                    Worker.start(new Clicker(x, y, width, height), peep);
                 } catch (AWTException | NoSuchAlgorithmException ignore) {
                 }
             } else {
@@ -151,7 +173,7 @@ public class Main extends Application {
             }
         });
 
-        ToggleButton aim = new ToggleButton("AIM");
+        aim = new ToggleButton("AIM");
         aim.setPrefSize(120, 40);
         aim.setOnAction(_ -> {
             if (aim.isSelected()) {
@@ -161,7 +183,7 @@ public class Main extends Application {
             }
         });
 
-        ToggleButton magnify = new ToggleButton("MAGNIFY");
+        magnify = new ToggleButton("MAGNIFY");
         magnify.setPrefSize(120, 40);
         magnify.setOnAction(e -> {
             if (magnify.isSelected()) {
@@ -182,7 +204,7 @@ public class Main extends Application {
             }
         });
 
-        Button close = new Button("close");
+        close = new Button("close");
         close.setPrefSize(120, 20);
         close.setOnAction(_ -> {
             slave.close();
@@ -193,7 +215,7 @@ public class Main extends Application {
             Magnifier.stop();
         });
 
-        root.getChildren().addAll(title, start, aim, magnify, close);
+        root.getChildren().addAll(title, start, aim, peep, magnify, close);
 
         Scene mainScene = new Scene(root);
         ext.ifPresent(mainScene.getStylesheets()::add);
@@ -201,8 +223,8 @@ public class Main extends Application {
         main.initStyle(StageStyle.UNDECORATED);
         main.setAlwaysOnTop(true);
         main.setResizable(false);
-        main.setX(2300);
-        main.setY(650);
+        main.setX(xOffset + 1770);
+        main.setY(yOffset + 250);
         main.setScene(mainScene);
 
         main.setOnCloseRequest(_ -> Worker.stop());

@@ -1,5 +1,7 @@
 package vinneg.natpoacher;
 
+import javafx.scene.image.ImageView;
+
 import java.awt.event.KeyEvent;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
@@ -7,6 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.System.currentTimeMillis;
+import static vinneg.natpoacher.Log.log;
 
 public class Worker implements Runnable {
 
@@ -17,10 +20,14 @@ public class Worker implements Runnable {
     private static final int LURE_DURATION = 21_000;
     private static final int BUFF_CAST = 6_000 + 100;
 
-    public Clicker clicker;
+    public final Clicker clicker;
+    public final ImageView peep;
     public final MouseCursor mouseCursor;
 
-    public Worker() throws NoSuchAlgorithmException {
+    public Worker(Clicker clicker, ImageView peep) throws NoSuchAlgorithmException {
+        this.clicker = clicker;
+        this.peep = peep;
+
         this.mouseCursor = new MouseCursor();
     }
 
@@ -73,12 +80,12 @@ public class Worker implements Runnable {
             }
 
             if (m == null || attempt >= 15) {
-                System.out.println("Bobber not found " + noBobber.incrementAndGet() + " times");
+                log("Bobber not found %d times", noBobber.incrementAndGet());
 
                 clicker.delay(500);
 
                 if (noBobber.getPlain() > 35) {
-                    System.out.println("Bobber not found 25 times in a row. Exit");
+                    log("Bobber not found 25 times in a row. Exit");
                     return;
                 }
 
@@ -88,9 +95,9 @@ public class Worker implements Runnable {
             }
 
             // bobber found
-            Bobber bobber = new Bobber(clicker);
+            Bobber bobber = new Bobber(clicker, peep);
 
-//            System.out.println("Bobber found with redness " + bobber.redness);
+            log("Bobber found with redness %d", bobber.redness);
 
             long et = currentTimeMillis() + LURE_DURATION;
             boolean bite = false;
@@ -107,9 +114,10 @@ public class Worker implements Runnable {
             if (bite) {
                 clicker.click();
             } else {
-                Bobber.decDelta();
-//                System.out.println("Bobber not triggered");
+                log("Bobber not triggered");
             }
+
+            peep.setImage(null);
 
             if (Thread.currentThread().isInterrupted()) {
                 break;
@@ -126,13 +134,12 @@ public class Worker implements Runnable {
             clicker.key(KeyEvent.VK_SLASH);
         }
 
-        System.out.println("Fishing finished");
+        log("Fishing finished");
     }
 
-    public static void start(Clicker clicker) throws NoSuchAlgorithmException {
+    public static void start(Clicker clicker, ImageView peep) throws NoSuchAlgorithmException {
         if (main == null) {
-            Worker worker = new Worker();
-            worker.clicker = clicker;
+            Worker worker = new Worker(clicker, peep);
 
             main = new Thread(worker, UUID.randomUUID().toString());
         }

@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import static vinneg.natpoacher.Log.log;
+
 public class Seeker {
 
     public static final int R = 15;
@@ -229,7 +231,7 @@ public class Seeker {
                 .map(v -> (v >> 16) & 0xFF)
                 .ifPresent(v -> threshold = v);
 
-        System.out.println(threshold);
+        log("Threshold set to %d", threshold);
 
         filtered.stream()
                 .map(v -> {
@@ -242,7 +244,7 @@ public class Seeker {
                 .findFirst()
                 .ifPresent(v -> ratio = v);
 
-        System.out.println(ratio);
+        log("Ration set to %f", ratio);
     }
 
 }
