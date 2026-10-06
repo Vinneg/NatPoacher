@@ -113,11 +113,6 @@ public class Seeker {
             this.y = y;
         }
 
-        public Pixel(Mass m) {
-            this.x = (int) m.x;
-            this.y = (int) m.y;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -140,6 +135,12 @@ public class Seeker {
             this.x = x;
             this.y = y;
             this.m = 1;
+        }
+
+        public Mass(double x, double y, int m) {
+            this.x = x;
+            this.y = y;
+            this.m = m;
         }
 
         public Mass(Pixel source) {

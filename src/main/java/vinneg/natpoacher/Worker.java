@@ -17,7 +17,7 @@ public class Worker implements Runnable {
     private static long nextLure = 0;
 
     private static final int BUFF_DURATION = 600_000;
-    private static final int LURE_DURATION = 21_000;
+    private static final int LURE_DURATION = 30_000;
     private static final int BUFF_CAST = 6_000 + 100;
 
     public final Clicker clicker;
@@ -97,7 +97,7 @@ public class Worker implements Runnable {
             // bobber found
             Bobber bobber = new Bobber(clicker, peep);
 
-            log("Bobber found with redness %d", bobber.redness);
+            log("Bobber found with redness %d", bobber.mass.m);
 
             long et = currentTimeMillis() + LURE_DURATION;
             boolean bite = false;
