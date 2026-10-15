@@ -74,7 +74,7 @@ public class Bobber {
 
         mass = cur;
 
-        return resR || resD;
+        return resR && resD;
     }
 
 }

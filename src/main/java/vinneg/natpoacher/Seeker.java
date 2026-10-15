@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static vinneg.natpoacher.Log.log;
 
@@ -199,6 +200,8 @@ public class Seeker {
     }
 
     public static void define(BufferedImage img) {
+        final double dr = 1.2;
+
         int width = img.getWidth();
         int height = img.getHeight();
 
@@ -212,16 +215,37 @@ public class Seeker {
                 int green = (rgb >> 8) & 0xFF;
                 int blue = rgb & 0xFF;
 
-                if (red > green * 1.9 && red > blue * 1.9) {
+                if (red > green * dr && red > blue * dr) {
                     candidates.add(rgb);
                 }
             }
         }
 
         List<Integer> filtered = candidates.stream()
-                .sorted((l, r) -> ((r >> 16) & 0xFF) - ((l >> 16) & 0xFF))
-                .skip(candidates.size() / 3)
+                .sorted((l, r) -> {
+                    int lr = (l >> 16) & 0xFF;
+                    int lg = (l >> 8) & 0xFF;
+                    int lb = l & 0xFF;
+
+                    int rr = (r >> 16) & 0xFF;
+                    int rg = (r >> 8) & 0xFF;
+                    int rb = r & 0xFF;
+
+                    return (int) Math.min((double) rr / rg, (double) rr / rb) - (int) Math.min((double) lr / lg, (double) lr / lb);
+                }).skip(candidates.size() * 2L / 3)
                 .toList();
+
+        log("Filtered: " + toRGB(filtered));
+
+//                .findFirst()
+//                .ifPresent(v -> ratio = v);
+
+//        List<Integer> filtered = candidates.stream()
+//                .sorted(Comparator.comparingInt(l -> ((l >> 16) & 0xFF)))
+//                .skip(candidates.size() * 2L / 3)
+//                .toList();
+
+        log("Filtered: " + toRGB(filtered));
 
         Optional.of(filtered)
                 .map(List::getFirst)
@@ -241,7 +265,18 @@ public class Seeker {
                 .findFirst()
                 .ifPresent(v -> ratio = v);
 
-        log("Ration set to %f", ratio);
+        log("Ratio set to %f", ratio);
+    }
+
+    private static String toRGB(List<Integer> source) {
+        return source.stream()
+                .map(rgb -> {
+                    int red = (rgb >> 16) & 0xFF;
+                    int green = (rgb >> 8) & 0xFF;
+                    int blue = rgb & 0xFF;
+
+                    return "[" + red + " " + green + " " + blue + "]";
+                }).collect(Collectors.joining(", "));
     }
 
 }

@@ -11,7 +11,7 @@
 }
 
 .label {
-    -fx-background-color: #000000;
+    ''-fx-background-color: #000000;
     -fx-font-weight: bold;
     -fx-alignment: center;
     -fx-text-fill: #3c3c3c;
