@@ -1,6 +1,7 @@
 package vinneg.natpoacher;
 
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -79,7 +80,8 @@ public class Main extends Application {
 
                 Optional.of(new java.awt.Rectangle(x - Seeker.R, y - Seeker.R, SIDE, SIDE))
                         .map(robot::createScreenCapture)
-                        .ifPresent(Seeker::define);
+                        .map(Seeker::define)
+                        .ifPresent(v -> peep.setImage(SwingFXUtils.toFXImage(v, null)));
 
                 Optional.of(Seeker.threshold)
                         .map(v -> Color.color((double) v / 256, v / Seeker.ratio / 256, v / Seeker.ratio / 256))
@@ -232,7 +234,7 @@ public class Main extends Application {
         main.setAlwaysOnTop(true);
         main.setResizable(false);
         main.setX(xOffset + 1770);
-        main.setY(yOffset + 250);
+        main.setY(yOffset + 200);
         main.setScene(mainScene);
 
         main.setOnCloseRequest(_ -> Worker.stop());

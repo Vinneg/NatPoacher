@@ -1,9 +1,15 @@
 package vinneg.natpoacher;
 
+import javafx.util.Pair;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static vinneg.natpoacher.Log.log;
@@ -199,13 +205,13 @@ public class Seeker {
 
     }
 
-    public static void define(BufferedImage img) {
+    public static BufferedImage define(BufferedImage img) {
         final double dr = 1.2;
 
         int width = img.getWidth();
         int height = img.getHeight();
 
-        List<Integer> candidates = new LinkedList<>();
+        Map<Pair<Integer, Integer>, Integer> candidates = new HashMap<>();
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -216,13 +222,17 @@ public class Seeker {
                 int blue = rgb & 0xFF;
 
                 if (red > green * dr && red > blue * dr) {
-                    candidates.add(rgb);
+                    candidates.put(new Pair<>(x, y), rgb);
                 }
             }
         }
 
-        List<Integer> filtered = candidates.stream()
-                .sorted((l, r) -> {
+        Map<Pair<Integer, Integer>, Integer> filtered = candidates.entrySet()
+                .stream()
+                .sorted((le, re) -> {
+                    int l = le.getValue();
+                    int r = re.getValue();
+
                     int lr = (l >> 16) & 0xFF;
                     int lg = (l >> 8) & 0xFF;
                     int lb = l & 0xFF;
@@ -232,40 +242,43 @@ public class Seeker {
                     int rb = r & 0xFF;
 
                     return (int) Math.min((double) rr / rg, (double) rr / rb) - (int) Math.min((double) lr / lg, (double) lr / lb);
-                }).skip(candidates.size() * 2L / 3)
-                .toList();
+                }).limit(50)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        log("Filtered: " + toRGB(filtered));
+        ColorModel cm = img.getColorModel();
+        WritableRaster raster = img.copyData(null);
+        BufferedImage copy = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
 
-//                .findFirst()
-//                .ifPresent(v -> ratio = v);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (filtered.get(new Pair<>(x, y)) == null) {
+                    copy.setRGB(x, y, Color.GREEN.getRGB());
+                }
+            }
+        }
 
-//        List<Integer> filtered = candidates.stream()
-//                .sorted(Comparator.comparingInt(l -> ((l >> 16) & 0xFF)))
-//                .skip(candidates.size() * 2L / 3)
-//                .toList();
+        filtered.values()
+                .stream()
+                .mapToDouble(v -> {
+                    int r = (v >> 16) & 0xFF;
+                    int g = (v >> 8) & 0xFF;
+                    int b = v & 0xFF;
 
-        log("Filtered: " + toRGB(filtered));
+                    return Math.min((double) r / g, (double) r / b);
+                }).min()
+                .ifPresent(v -> ratio = v);
 
-        Optional.of(filtered)
-                .map(List::getFirst)
-                .map(v -> (v >> 16) & 0xFF)
+        log("Ratio set to %f", ratio);
+
+        filtered.values()
+                .stream()
+                .mapToInt(v -> (v >> 16) & 0xFF)
+                .min()
                 .ifPresent(v -> threshold = v);
 
         log("Threshold set to %d", threshold);
 
-        filtered.stream()
-                .map(v -> {
-                    int red = (v >> 16) & 0xFF;
-                    int green = (v >> 8) & 0xFF;
-                    int blue = v & 0xFF;
-
-                    return Math.min((double) red / green, (double) red / blue);
-                }).sorted()
-                .findFirst()
-                .ifPresent(v -> ratio = v);
-
-        log("Ratio set to %f", ratio);
+        return copy;
     }
 
     private static String toRGB(List<Integer> source) {
