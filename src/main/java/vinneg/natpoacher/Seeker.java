@@ -2,7 +2,6 @@ package vinneg.natpoacher;
 
 import javafx.util.Pair;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.awt.Color.GREEN;
 import static vinneg.natpoacher.Log.log;
 
 public class Seeker {
@@ -252,7 +252,7 @@ public class Seeker {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if (filtered.get(new Pair<>(x, y)) == null) {
-                    copy.setRGB(x, y, Color.GREEN.getRGB());
+                    copy.setRGB(x, y, GREEN.getRGB());
                 }
             }
         }

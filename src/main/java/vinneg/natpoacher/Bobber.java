@@ -7,6 +7,8 @@ import vinneg.natpoacher.Seeker.Mass;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static java.awt.Color.BLUE;
+import static java.awt.Color.GREEN;
 import static vinneg.natpoacher.Log.log;
 
 public class Bobber {
@@ -38,7 +40,6 @@ public class Bobber {
 
     private Mass getRedness() {
         BufferedImage image = clicker.bobber(this);
-        peep.setImage(SwingFXUtils.toFXImage(image, null));
 
         int m = 0;
         long xm = 0;
@@ -50,11 +51,23 @@ public class Bobber {
                     m++;
                     xm += x;
                     ym += y;
+                } else {
+                    image.setRGB(x, y, GREEN.getRGB());
                 }
             }
         }
 
-        return new Mass((double) xm / m, (double) ym / m, m);
+        Mass cm = new Mass((double) xm / m, (double) ym / m, m);
+
+        image.setRGB((int) cm.x, (int) cm.y, BLUE.getRGB());
+        image.setRGB((int) Math.max(0, cm.x - 1), (int) cm.y, BLUE.getRGB());
+        image.setRGB((int) Math.min(SIDE - 1, cm.x + 1), (int) cm.y, BLUE.getRGB());
+        image.setRGB((int) cm.x, (int) Math.max(0, cm.y - 1), BLUE.getRGB());
+        image.setRGB((int) cm.x, (int) Math.min(SIDE - 1, cm.y + 1), BLUE.getRGB());
+
+        peep.setImage(SwingFXUtils.toFXImage(image, null));
+
+        return cm;
     }
 
     public boolean still() {

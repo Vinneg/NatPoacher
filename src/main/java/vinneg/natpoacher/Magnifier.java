@@ -14,8 +14,8 @@ public class Magnifier implements Runnable {
 
     private static Thread main;
 
-    private Stage magni;
-    private ImageView view;
+    private final Stage magni;
+    private final ImageView view;
     private final Robot robot;
 
     public Magnifier(Stage magni, ImageView view) throws AWTException {
@@ -36,8 +36,8 @@ public class Magnifier implements Runnable {
             BufferedImage img = robot.createScreenCapture(rect);
             view.setImage(SwingFXUtils.toFXImage(img, null));
 
-            magni.setX(x + SIDE / 2);
-            magni.setY(y + SIDE / 2);
+            magni.setX(x + SIDE / 2D);
+            magni.setY(y + SIDE / 2D);
         }
     }
 

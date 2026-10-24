@@ -55,6 +55,7 @@ public class Main extends Application {
 
         Label tar = new Label();
         tar.setPrefSize(120, 20);
+        tar.setText("%d=T-R=%.2f".formatted(Seeker.threshold, Seeker.ratio));
 
         ImageView peep = new ImageView();
         peep.setFitWidth(120);
@@ -62,7 +63,7 @@ public class Main extends Application {
         peep.setPreserveRatio(false);
 
         var overPane = new StackPane();
-        overPane.setOpacity(0.1);
+        overPane.setOpacity(0.05);
 
         Scene overScene = new Scene(overPane, Color.TRANSPARENT);
         overScene.setFill(Color.TRANSPARENT);
@@ -88,6 +89,8 @@ public class Main extends Application {
                         .map(v -> new BackgroundFill(v, CornerRadii.EMPTY, null))
                         .map(Background::new)
                         .ifPresent(tar::setBackground);
+
+                tar.setText("%d=T-R=%.2f".formatted(Seeker.threshold, Seeker.ratio));
             } catch (AWTException _) {
             }
         });
